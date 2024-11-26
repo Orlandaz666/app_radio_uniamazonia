@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() {
   runApp(RadioApp());
@@ -37,7 +39,7 @@ class _RadioPlayerState extends State<RadioPlayer> {
 
   void _initializePlayer() {
     _controller = VlcPlayerController.network(
-      'http://radio.udla.edu.co:8000',
+      'http://181.235.184.156:8000/',
       hwAcc: HwAcc.full,
       autoPlay: false,
       options: VlcPlayerOptions(),
@@ -57,15 +59,30 @@ class _RadioPlayerState extends State<RadioPlayer> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Siguenos en:'),
-          content: const Text('Facebook \n'
-              'Instagran\n '
-              'X\n '
-              'Pagina Web\n '),
+          backgroundColor: Colors.white,
+          title: const Text(
+            'Síguenos en:',
+            textAlign: TextAlign.center,
+          ),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [            
+              _socialmedia(const FaIcon(FontAwesomeIcons.squareFacebook), 'https://www.facebook.com/uniamazonia.edu.co'),
+              const SizedBox(width: 10),
+              _socialmedia(const FaIcon(FontAwesomeIcons.squareInstagram), 'https://www.instagram.com/uniamazonia'),
+              const SizedBox(width: 10),
+              _socialmedia(const FaIcon(FontAwesomeIcons.xTwitter), 'https://x.com/uniamazonia'),
+              const SizedBox(width: 10),
+              _socialmedia(const FaIcon(FontAwesomeIcons.tiktok), 'https://www.tiktok.com/@uniamazonia'),
+              const SizedBox(width: 10),
+              _socialmedia(const FaIcon(FontAwesomeIcons.globe), 'https://www.uniamazonia.edu.co'),
+            ],
+          ),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
+                foregroundColor: const Color(0xFF0B750E),
               ),
               child: const Text('Cerrar'),
               onPressed: () {
@@ -78,19 +95,35 @@ class _RadioPlayerState extends State<RadioPlayer> {
     );
   }
 
+  _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      //print('No se pudo abrir el enlace: $url');
+    }
+  }
+
   _showAboutUsDialog() {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Hecho por:'),
+          backgroundColor: Colors.white,
+          title: const Text(
+            'Hecho por:',
+            textAlign: TextAlign.center, // Centrar el título
+          ),
           content: const Text(
             'Oficina de Gestión de Información y Comunicaciones\n'
-              ),
+            'V 1.0.0',
+            textAlign: TextAlign.center, // Centrar el contenido del texto
+          ),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
+                foregroundColor: const Color(0xFF0B750E),
               ),
               child: const Text('Cerrar'),
               onPressed: () {
@@ -125,6 +158,18 @@ class _RadioPlayerState extends State<RadioPlayer> {
   }
 
 //Widgets
+
+  _socialmedia(FaIcon faicon, String url) {
+  return GestureDetector(
+    onTap: () => _launchURL(url),
+    child: FaIcon(
+      faicon.icon,  // Usar el icono del FaIcon pasado como parámetro
+      size: 35,
+      color: const Color(0xFF0B750E),
+    ),
+  );
+}
+
 
   _listitle(Icon icon, Text text, method) {
     return ListTile(
@@ -162,7 +207,7 @@ class _RadioPlayerState extends State<RadioPlayer> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         iconTheme: const IconThemeData(
-          color: const Color(0xFF0B750E),
+          color: Color(0xFF0B750E),
         ),
         backgroundColor: Colors.white,
       ),
@@ -185,8 +230,8 @@ class _RadioPlayerState extends State<RadioPlayer> {
                 const Text('Acerca de'), _showAboutUsDialog),
             _listitle(const Icon(Icons.language), const Text('Siguenos'),
                 _showFollowUsDialog),
-            _listitle(const Icon(Icons.share), const Text('Comparte'),
-                _showFollowUsDialog),
+            // _listitle(const Icon(Icons.share), const Text('Comparte'),
+            //     _showFollowUsDialog),
           ],
         ),
       ),
@@ -215,8 +260,8 @@ class _RadioPlayerState extends State<RadioPlayer> {
               child: Row(
                 children: [
                   const Icon(Icons.volume_down, color: Colors.grey),
-                  Expanded(
-                    child: Slider(
+                  Expanded(                  
+                    child: Slider(   
                       min: 0,
                       max: 1,
                       activeColor:
@@ -232,7 +277,7 @@ class _RadioPlayerState extends State<RadioPlayer> {
                           : null,
                       value: _volumeListenerValue,
                     ),
-                  ),
+                    ),
                   const Icon(Icons.volume_up,
                       color: Colors.grey), // Ícono de volumen máximo
                 ],
